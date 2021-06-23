@@ -30,13 +30,9 @@ func getUsers(w http.ResponseWriter, r *http.Request){
 
 func createUser(w http.ResponseWriter, r *http.Request){
 	var user CreateUserDto
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
-		var e = errors.HTTPErrors {
-			Message: err.Error(),
-			Code: 500,
-		}
-		errors.HandleError(w,e)
+	if err := utils.Deserialize(r.Body,&user); err != nil {
+		errors.HandleError(w,*err)
+		return
 	}
 	var e = services.CreateUser(user)
 	if(e != nil){
